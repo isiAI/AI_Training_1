@@ -1,16 +1,26 @@
-# This is a sample Python script.
+import pandas as pd
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
-# Press Umschalt+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+dataset = pd.read_csv('cancer.csv')
 
+x = dataset.drop(columns=["diagnosis(1=m, 0=b)"])
+y = dataset["diagnosis(1=m, 0=b)"]
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Strg+F8 to toggle the breakpoint.
+# Split the data into a training set and a testing set.
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
+# Build and train the model.
+model = tf.keras.models.Sequential()
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+model.add(tf.keras.layers.Dense(256, input_shape=x_train.shape[1:], activation='sigmoid'))
+model.add(tf.keras.layers.Dense(256, activation='sigmoid'))
+model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=1000)
+
+# Evaluate the model.
+print("Lets evaluate\n")
+model.evaluate(x_test, y_test)
